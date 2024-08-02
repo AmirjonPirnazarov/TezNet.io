@@ -2,16 +2,24 @@
 
 // Предопределенные пользователи для авторизации
 const users = [
-    { username: 'Amir', password: '12345' },
+    { username: 'agent1', password: 'password1' },
     { username: 'agent2', password: 'password2' },
     { username: 'agent3', password: 'password3' },
     { username: 'agent4', password: 'password4' },
     { username: 'agent5', password: 'password5' },
     { username: 'agent6', password: 'password6' },
+    { username: 'admin', password: 'adminpassword' }
 ];
 
+let currentUser;
+
 function authenticate(username, password) {
-    return users.some(user => user.username === username && user.password === password);
+    const user = users.find(user => user.username === username && user.password === password);
+    if (user) {
+        currentUser = user;
+        return true;
+    }
+    return false;
 }
 
 document.getElementById('auth-form').addEventListener('submit', function(event) {
@@ -22,12 +30,17 @@ document.getElementById('auth-form').addEventListener('submit', function(event) 
     if (authenticate(username, password)) {
         document.getElementById('auth').style.display = 'none';
         document.getElementById('checklist').style.display = 'block';
+        if (currentUser.username === 'admin') {
+            document.getElementById('admin-button').style.display = 'block';
+            document.getElementById('view-data-button').style.display = 'block';
+        }
     } else {
         alert('Неправильный логин или пароль');
     }
 });
 
 let currentStep = 1;
+let entries = [];
 
 function nextStep() {
     if (currentStep === 1) {
@@ -55,9 +68,7 @@ function saveEntry() {
     const comments = document.getElementById('comments').value;
 
     const entry = { apartment, status, internet, comments };
-    let entries = JSON.parse(localStorage.getItem('entries')) || [];
     entries.push(entry);
-    localStorage.setItem('entries', JSON.stringify(entries));
 
     alert('Данные сохранены');
     cancelEntry();
@@ -73,18 +84,47 @@ document.getElementById('checklist-form').addEventListener('submit', function(ev
     const endTime = document.getElementById('end-time').value;
 
     const checklist = {
+        agentName: currentUser.username,
         date,
         district,
         house,
         startTime,
         endTime,
-        entries: JSON.parse(localStorage.getItem('entries')) || []
+        entries
     };
 
-    console.log('Обходной лист:', checklist);
-    alert('Обход завершен');
-
-    // Очистка данных
-    localStorage.removeItem('entries');
+    let allData = JSON.parse(localStorage.getItem('agentData')) || [];
+    allData.push(checklist);
+    localStorage.setItem('agentData', JSON.stringify(allData));
+    
+    alert('Обходной лист завершен');
     location.reload();
 });
+
+function downloadData() {
+    const allData = JSON.parse(localStorage.getItem('agentData')) || [];
+    const csvContent = "data:text/csv;charset=utf-8," 
+        + allData.map(e => 
+            `${e.agentName},${e.date},${e.district},${e.house},${e.startTime},${e.endTime},${e.entries.map(entry => `${entry.apartment},${entry.status},${entry.internet},${entry.comments}`).join(',')}`
+        ).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "agent_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function viewData() {
+    document.getElementById('checklist').style.display = 'none';
+    document.getElementById('admin-view').style.display = 'block';
+    const allData = JSON.parse(localStorage.getItem('agentData')) || [];
+    document.getElementById('admin-data').textContent = JSON.stringify(allData, null, 2);
+}
+
+function backToChecklist() {
+    document.getElementById('admin-view').style.display = 'none';
+    document.getElementById('checklist').style.display = 'block';
+}

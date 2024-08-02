@@ -7,52 +7,56 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="auth">
-        <h1>Авторизация</h1>
+   <div id="auth">
+        <h2>Авторизация</h2>
         <form id="auth-form">
-            <label for="username">Логин:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="text" id="username" placeholder="Логин" required>
+            <input type="password" id="password" placeholder="Пароль" required>
             <button type="submit">Войти</button>
         </form>
     </div>
 
     <div id="checklist" style="display: none;">
-        <h1>Обходной Лист</h1>
+        <h2>Обходной лист</h2>
         <form id="checklist-form">
             <div id="step1">
                 <label for="date">Дата:</label>
-                <input type="date" id="date" name="date" required>
+                <input type="date" id="date" required>
                 <label for="district">Микрорайон:</label>
-                <input type="text" id="district" name="district" required>
+                <input type="text" id="district" required>
                 <label for="house">Дом:</label>
-                <input type="text" id="house" name="house" required>
+                <input type="text" id="house" required>
                 <label for="start-time">Время начала:</label>
-                <input type="time" id="start-time" name="start-time" required>
+                <input type="time" id="start-time" required>
                 <button type="button" onclick="nextStep()">Далее</button>
             </div>
-
             <div id="step2" style="display: none;">
                 <label for="apartment">Квартира:</label>
-                <input type="text" id="apartment" name="apartment" required>
+                <input type="text" id="apartment" required>
                 <label for="status">Статус:</label>
-                <input type="text" id="status" name="status" required>
+                <input type="text" id="status" required>
                 <label for="internet">Интернет:</label>
-                <input type="text" id="internet" name="internet" required>
+                <input type="text" id="internet" required>
                 <label for="comments">Комментарии:</label>
-                <textarea id="comments" name="comments" required></textarea>
-                <button type="button" onclick="cancelEntry()">Отменить</button>
+                <textarea id="comments" required></textarea>
                 <button type="button" onclick="saveEntry()">Сохранить</button>
+                <button type="button" onclick="cancelEntry()">Отменить</button>
                 <button type="button" onclick="nextStep()">Далее</button>
             </div>
-
             <div id="step3" style="display: none;">
                 <label for="end-time">Время окончания:</label>
-                <input type="time" id="end-time" name="end-time" required>
+                <input type="time" id="end-time" required>
                 <button type="submit">Завершить</button>
             </div>
         </form>
+        <button id="admin-button" style="display: none;" onclick="downloadData()">Скачать данные</button>
+        <button id="view-data-button" style="display: none;" onclick="viewData()">Просмотреть данные</button>
+    </div>
+
+    <div id="admin-view" style="display: none;">
+        <h2>Данные агентов</h2>
+        <pre id="admin-data"></pre>
+        <button onclick="backToChecklist()">Назад</button>
     </div>
 
     <script src="js/script.js"></script>
